@@ -106,7 +106,7 @@ export default function LoginPage() {
       return
     }
 
-    saveSession(account)
+    saveSession(account, { otpVerified: false })
     router.push("/otp-verify")
   }
 

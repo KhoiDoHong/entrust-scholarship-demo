@@ -1,3 +1,8 @@
+import {
+  AUTH_OTP_VERIFIED_COOKIE,
+  AUTH_USER_ID_COOKIE,
+} from "@/lib/auth-constants"
+
 export type UserRole =
   | "school"           // 養成校
   | "corporation"      // 法人（養成校法人・介護施設）
@@ -47,14 +52,52 @@ export const DEMO_ACCOUNTS: UserAccount[] = [
   },
 ]
 
+const SESSION_TTL_SEC = 60 * 60 * 8
+
+function setAuthCookies(userId: string, otpVerified: boolean) {
+  const otpValue = otpVerified ? "1" : "0"
+  document.cookie = `${AUTH_USER_ID_COOKIE}=${encodeURIComponent(userId)}; path=/; max-age=${SESSION_TTL_SEC}; SameSite=Lax`
+  document.cookie = `${AUTH_OTP_VERIFIED_COOKIE}=${otpValue}; path=/; max-age=${SESSION_TTL_SEC}; SameSite=Lax`
+}
+
+function clearAuthCookies() {
+  document.cookie = `${AUTH_USER_ID_COOKIE}=; path=/; max-age=0`
+  document.cookie = `${AUTH_OTP_VERIFIED_COOKIE}=; path=/; max-age=0`
+}
+
+function readOtpVerifiedFromStorage(): boolean {
+  return sessionStorage.getItem("otpVerified") === "1"
+}
+
 export function findAccount(userId: string): UserAccount | null {
   return DEMO_ACCOUNTS.find((a) => a.userId.toLowerCase() === userId.toLowerCase()) ?? null
 }
 
-export function saveSession(account: UserAccount) {
-  if (typeof window !== "undefined") {
-    sessionStorage.setItem("currentUser", JSON.stringify(account))
+export function saveSession(
+  account: UserAccount,
+  options?: { otpVerified?: boolean }
+) {
+  if (typeof window === "undefined") return
+
+  const otpVerified = options?.otpVerified ?? readOtpVerifiedFromStorage()
+  sessionStorage.setItem("currentUser", JSON.stringify(account))
+  sessionStorage.setItem("otpVerified", otpVerified ? "1" : "0")
+  setAuthCookies(account.userId, otpVerified)
+}
+
+export function markOtpVerified() {
+  if (typeof window === "undefined") return
+
+  sessionStorage.setItem("otpVerified", "1")
+  const session = getSession()
+  if (session) {
+    setAuthCookies(session.userId, true)
   }
+}
+
+export function isOtpVerified(): boolean {
+  if (typeof window === "undefined") return false
+  return readOtpVerifiedFromStorage()
 }
 
 export function getSession(): UserAccount | null {
@@ -68,10 +111,18 @@ export function getSession(): UserAccount | null {
   }
 }
 
+/** OTP完了後のセッションのみ返す（保護ページ用） */
+export function getAuthenticatedSession(): UserAccount | null {
+  const session = getSession()
+  if (!session || !isOtpVerified()) return null
+  return session
+}
+
 export function clearSession() {
-  if (typeof window !== "undefined") {
-    sessionStorage.removeItem("currentUser")
-  }
+  if (typeof window === "undefined") return
+  sessionStorage.removeItem("currentUser")
+  sessionStorage.removeItem("otpVerified")
+  clearAuthCookies()
 }
 
 /** 不備申請の内容修正 — 養成校・イントラストのみ（法人施設は不可） */

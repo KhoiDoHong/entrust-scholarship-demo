@@ -6,7 +6,7 @@ import { formatEnrollmentDateDisplay } from "@/lib/application-wizard-shared"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ApplicationStatusBadge } from "@/components/status-badge"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 import { getApplicationById } from "@/lib/applications-store"
 import { corpFacilityLabel } from "@/lib/contract-notifications"
@@ -22,7 +22,7 @@ export default function ApplicationDetailPage() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
   }, [])
 
   const canUpload = currentUser?.role !== "corporation" && currentUser?.role !== "association"

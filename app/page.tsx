@@ -26,7 +26,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { useToast } from "@/hooks/use-toast"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   getDashboardApplicationCounts,
   getDashboardContractCounts,
@@ -130,7 +130,7 @@ export default function Dashboard() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
   }, [])
 
   const appCounts = useMemo(
@@ -151,8 +151,6 @@ export default function Dashboard() {
       title: "メールアドレスを変更しました。",
     })
   }, [toast])
-
-  if (!currentUser) return null
 
   return (
     <DashboardLayout>

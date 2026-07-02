@@ -23,7 +23,8 @@ import {
   Building2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getSession, clearSession, type UserAccount, type UserRole } from "@/lib/auth"
+import { clearSession, type UserAccount, type UserRole } from "@/lib/auth"
+import { AuthGuard } from "@/components/auth-guard"
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "ダッシュボード", href: "/" },
@@ -100,23 +101,17 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+function DashboardShell({
+  currentUser,
+  children,
+}: {
+  currentUser: UserAccount
+  children: React.ReactNode
+}) {
   const pathname = usePathname()
   const router = useRouter()
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
-  const [authChecked, setAuthChecked] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const session = getSession()
-    if (!session) {
-      router.replace("/login")
-    } else {
-      setCurrentUser(session)
-    }
-    setAuthChecked(true)
-  }, [router])
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -134,21 +129,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   const visibleContractSidebar = useMemo(
-    () =>
-      currentUser
-        ? contractSidebarItems.filter((item) => item.roles.includes(currentUser.role))
-        : [],
-    [currentUser]
+    () => contractSidebarItems.filter((item) => item.roles.includes(currentUser.role)),
+    [currentUser.role]
   )
 
   const visibleSidebarAfterContracts = useMemo(
     () =>
-      currentUser
-        ? sidebarItemsAfterContracts.filter(
-            (item) => !item.roles || item.roles.includes(currentUser.role)
-          )
-        : [],
-    [currentUser]
+      sidebarItemsAfterContracts.filter(
+        (item) => !item.roles || item.roles.includes(currentUser.role)
+      ),
+    [currentUser.role]
   )
 
   const isNavActive = (href: string) =>
@@ -173,11 +163,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     </button>
   )
 
-  if (!authChecked || !currentUser) return null
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#1e3a5f] rounded-lg flex items-center justify-center">
@@ -190,64 +177,67 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {currentUser && (
-            <>
-              <div className="flex items-center gap-2">
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900">{currentUser.name}</div>
-                  <div className="text-xs text-gray-500">{currentUser.organization}</div>
-                </div>
-                <span className={cn(
-                  "px-2 py-0.5 text-xs font-medium rounded text-white whitespace-nowrap",
-                  currentUser.role === "school" && "bg-green-600",
-                  currentUser.role === "corporation" && "bg-blue-600",
-                  currentUser.role === "association" && "bg-purple-600",
-                  currentUser.role === "entrust" && "bg-orange-500",
-                )}>
-                  {currentUser.label}
-                </span>
-              </div>
-              <div className="w-px h-8 bg-gray-200" />
-              <div className="relative" ref={menuRef}>
+          <div className="flex items-center gap-2">
+            <div className="text-right">
+              <div className="text-sm font-medium text-gray-900">{currentUser.name}</div>
+              <div className="text-xs text-gray-500">{currentUser.organization}</div>
+            </div>
+            <span
+              className={cn(
+                "px-2 py-0.5 text-xs font-medium rounded text-white whitespace-nowrap",
+                currentUser.role === "school" && "bg-green-600",
+                currentUser.role === "corporation" && "bg-blue-600",
+                currentUser.role === "association" && "bg-purple-600",
+                currentUser.role === "entrust" && "bg-orange-500"
+              )}
+            >
+              {currentUser.label}
+            </span>
+          </div>
+          <div className="w-px h-8 bg-gray-200" />
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+            >
+              <UserCircle className="w-6 h-6" />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                 <button
-                  onClick={() => setMenuOpen((prev) => !prev)}
-                  className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    router.push("/account/email")
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  <UserCircle className="w-6 h-6" />
+                  <Mail className="w-4 h-4 text-gray-400" />
+                  メールアドレス変更
                 </button>
-                {menuOpen && (
-                  <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <button
-                      onClick={() => { setMenuOpen(false); router.push("/account/email") }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      メールアドレス変更
-                    </button>
-                    <button
-                      onClick={() => { setMenuOpen(false); router.push("/account/password") }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <KeyRound className="w-4 h-4 text-gray-400" />
-                      パスワード変更
-                    </button>
-                    <div className="my-1 border-t border-gray-100" />
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      ログアウト
-                    </button>
-                  </div>
-                )}
+                <button
+                  onClick={() => {
+                    setMenuOpen(false)
+                    router.push("/account/password")
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <KeyRound className="w-4 h-4 text-gray-400" />
+                  パスワード変更
+                </button>
+                <div className="my-1 border-t border-gray-100" />
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  ログアウト
+                </button>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Body */}
       <div className="flex flex-1">
         <aside className="w-56 bg-[#1e3a5f] flex flex-col">
           <nav className="flex-1 p-2 space-y-0.5">
@@ -260,7 +250,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {visibleSidebarAfterContracts.map((item) =>
               renderSidebarButton(item, isNavActive(item.href))
             )}
-            {currentUser?.role === "entrust" &&
+            {currentUser.role === "entrust" &&
               renderSidebarButton(
                 { icon: User, label: "ユーザ管理", href: "/user-management" },
                 isNavActive("/user-management")
@@ -268,12 +258,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </nav>
         </aside>
 
-        <main className="flex-1 p-8">
-          {children}
-        </main>
+        <main className="flex-1 p-8">{children}</main>
       </div>
     </div>
   )
 }
 
-
+export function DashboardLayout({ children }: DashboardLayoutProps) {
+  return (
+    <AuthGuard>
+      {(currentUser) => (
+        <DashboardShell currentUser={currentUser}>{children}</DashboardShell>
+      )}
+    </AuthGuard>
+  )
+}

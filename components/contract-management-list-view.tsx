@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search, X, Eye, Edit, RotateCcw, Send, ClipboardCheck } from "lucide-react"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   acknowledgeWorkflowTargets,
   getConfirmedContracts,
@@ -104,7 +104,7 @@ export function ContractManagementListView({
   const [selectedIds, setSelectedIds] = useState<number[]>([])
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     setContracts([...getConfirmedContracts()])
   }, [])
 
@@ -288,8 +288,6 @@ export function ContractManagementListView({
 
   const columnCount =
     (showJobcan ? 7 : 6) + (showBulkSelection ? 1 : 0) + (showPriorNoticeColumn ? 1 : 0)
-
-  if (!currentUser) return null
 
   if (selectedContract) {
     return (

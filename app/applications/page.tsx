@@ -17,7 +17,7 @@ import {
 import { StatusBadge, getStatusType } from "@/components/status-badge"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { getSession, canEditApplication, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, canEditApplication, type UserAccount } from "@/lib/auth"
 import {
   getApplications,
   getApplicationRemarksDisplay,
@@ -35,7 +35,7 @@ export default function ApplicationsPage() {
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
   }, [])
 
   const canEditApplicationRow = canEditApplication(currentUser)

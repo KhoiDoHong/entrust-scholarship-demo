@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { getSession, saveSession } from "@/lib/auth"
+import { getAuthenticatedSession, saveSession } from "@/lib/auth"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { toast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -97,7 +97,7 @@ export default function EmailChangePage() {
         return
       }
 
-      const session = getSession()
+      const session = getAuthenticatedSession()
       if (session) {
         saveSession({ ...session, email: newEmail })
       }

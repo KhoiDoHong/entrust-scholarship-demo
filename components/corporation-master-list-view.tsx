@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, X, Download, UserCog, Landmark, Eye, ArrowLeft } from "lucide-react"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import { ListPagination } from "@/components/list-pagination"
 import { getConfirmedContracts, updateContract, type ContractStatus } from "@/lib/contracts-store"
 import { cn } from "@/lib/utils"
@@ -97,7 +97,7 @@ export function CorporationMasterListView() {
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false)
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
   }, [])
 
   const roleScopedRecords = useMemo(
@@ -203,9 +203,9 @@ export function CorporationMasterListView() {
     URL.revokeObjectURL(url)
   }
 
-  if (!currentUser) return null
-
-  const canEdit = currentUser.role !== "entrust" && currentUser.role !== "association"
+  const canEdit = currentUser
+    ? currentUser.role !== "entrust" && currentUser.role !== "association"
+    : false
   const tableColSpan = canEdit ? 8 : 6
 
   if (selectedRecord) {

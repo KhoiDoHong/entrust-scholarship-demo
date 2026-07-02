@@ -5,7 +5,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Ban, Send } from "lucide-react"
 import { ContractStatusBadge } from "@/components/status-badge"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   approvedApps,
   filterAppsByRole,
@@ -36,7 +36,7 @@ export default function ContractConfirmationPage() {
   const [pendingAction, setPendingAction] = useState<PendingConfirmAction>(null)
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     return subscribeContractNotifications(() => setNotificationState(getContractNotificationState()))
   }, [])
 
@@ -104,7 +104,13 @@ export default function ContractConfirmationPage() {
     setAppliedFilters({ ...EMPTY_CONTRACT_FILTERS })
   }, [])
 
-  if (!currentUser) return null
+  if (!currentUser) {
+    return (
+      <DashboardLayout>
+        <div className="p-8 text-center text-gray-500">読み込み中...</div>
+      </DashboardLayout>
+    )
+  }
 
   if (!canAccess) {
     return (

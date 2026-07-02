@@ -13,7 +13,7 @@ import {
   completeApplicationCorrection,
   getApplicationById,
 } from "@/lib/applications-store"
-import { getSession, canEditApplication } from "@/lib/auth"
+import { getAuthenticatedSession, canEditApplication } from "@/lib/auth"
 import {
   WIZARD_STEPS,
   createEmptyFormData,
@@ -44,7 +44,7 @@ export default function EditApplicationPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFileMap>({})
   const [formData, setFormData] = useState<ApplicationFormData>(createEmptyFormData())
-  const [currentUser, setCurrentUser] = useState<ReturnType<typeof getSession>>(null)
+  const [currentUser, setCurrentUser] = useState<ReturnType<typeof getAuthenticatedSession>>(null)
 
   const app = getApplicationById(id)
 
@@ -55,7 +55,7 @@ export default function EditApplicationPage() {
   const schools = useMemo(() => getWizardSchools(currentUser), [currentUser])
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
   }, [])
 
   useEffect(() => {

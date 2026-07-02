@@ -16,7 +16,7 @@ import {
   Search, Eye, X, Download,
   UserPen, Users, BellRing, CheckCircle2, Wallet,
 } from "lucide-react"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import { getConfirmedContracts, updateContract, addPriorNotice, type ConfirmedContract, type ContractStatus } from "@/lib/contracts-store"
 import { cn } from "@/lib/utils"
 import { ListPagination } from "@/components/list-pagination"
@@ -170,7 +170,7 @@ export default function ContractManagementPage() {
   const refreshContracts = () => setContracts([...getConfirmedContracts()])
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     refreshContracts()
   }, [])
 
@@ -359,9 +359,9 @@ export default function ContractManagementPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (!currentUser) return null
-
-  const canEdit = currentUser.role !== "entrust" && currentUser.role !== "association"
+  const canEdit = currentUser
+    ? currentUser.role !== "entrust" && currentUser.role !== "association"
+    : false
 
   if (selectedContract) {
     return (

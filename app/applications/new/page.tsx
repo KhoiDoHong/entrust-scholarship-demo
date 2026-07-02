@@ -7,7 +7,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   WIZARD_STEPS,
   createEmptyFormData,
@@ -49,7 +49,7 @@ export default function NewApplicationPage() {
   const schools = useMemo(() => getWizardSchools(currentUser), [currentUser])
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     setIsLoading(false)
   }, [])
 

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { RotateCcw } from "lucide-react"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   confirmedThisMonth,
   corpFacilityLabel,
@@ -35,7 +35,7 @@ export default function ConfirmedThisMonthPage() {
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     return subscribeContractNotifications(() => setNotificationState(getContractNotificationState()))
   }, [])
 
@@ -95,7 +95,13 @@ export default function ConfirmedThisMonthPage() {
     setCurrentPage(1)
   }, [])
 
-  if (!currentUser) return null
+  if (!currentUser) {
+    return (
+      <DashboardLayout>
+        <div className="p-8 text-center text-gray-500">読み込み中...</div>
+      </DashboardLayout>
+    )
+  }
 
   if (currentUser.role !== "entrust") {
     return (

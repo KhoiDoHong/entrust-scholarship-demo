@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { getSession, type UserAccount } from "@/lib/auth"
+import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   approvedApps,
   filterAppsByRole,
@@ -23,7 +23,7 @@ export default function ContractCancellationsPage() {
   const [appliedFilters, setAppliedFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
 
   useEffect(() => {
-    setCurrentUser(getSession())
+    setCurrentUser(getAuthenticatedSession())
     return subscribeContractNotifications(() => setNotificationState(getContractNotificationState()))
   }, [])
 
@@ -44,8 +44,6 @@ export default function ContractCancellationsPage() {
     setFilters({ ...EMPTY_CONTRACT_FILTERS })
     setAppliedFilters({ ...EMPTY_CONTRACT_FILTERS })
   }, [])
-
-  if (!currentUser) return null
 
   return (
     <DashboardLayout>

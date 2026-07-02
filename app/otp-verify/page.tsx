@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Shield, Loader2, ArrowLeft } from "lucide-react"
-import { clearSession } from "@/lib/auth"
+import { clearSession, getSession, markOtpVerified } from "@/lib/auth"
 import { toast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
@@ -29,6 +29,12 @@ export default function OTPVerifyPage() {
   const verifyingRef = useRef(false)
 
   const resendActive = resendCooldown > 0
+
+  useEffect(() => {
+    if (!getSession()) {
+      router.replace("/login")
+    }
+  }, [router])
 
   useEffect(() => {
     if (!resendActive) return
@@ -54,6 +60,7 @@ export default function OTPVerifyPage() {
     setLoading(true)
 
     if (code === "123456") {
+      markOtpVerified()
       window.setTimeout(() => router.push("/"), 400)
       return
     }
