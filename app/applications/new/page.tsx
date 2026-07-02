@@ -259,21 +259,16 @@ export default function NewApplicationPage() {
             />
 
             <div className="flex items-center justify-between mt-12 pt-6 border-t">
-              {step === 1 ? (
-                <Link href="/applications">
-                  <Button variant="outline">キャンセル</Button>
-                </Link>
-              ) : (
-                <Button
-                  variant="outline"
-                  onClick={() => setStep((prev) => Math.max(prev - 1, 1))}
-                >
-                  戻る
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                onClick={() => setStep((prev) => Math.max(prev - 1, 1))}
+                disabled={step === 1}
+              >
+                前へ
+              </Button>
               {step === WIZARD_STEPS.length ? (
                 <Button onClick={handleSubmit} className="bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white">
-                  申請する
+                  申請
                 </Button>
               ) : (
                 <Button onClick={handleNext} className="bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white">
