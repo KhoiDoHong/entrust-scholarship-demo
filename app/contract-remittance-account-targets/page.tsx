@@ -18,7 +18,6 @@ export default function ContractRemittanceAccountTargetsPage() {
           title: "送金先口座申請",
           submitLabel: "申請",
           confirmMessage: SUBMIT_CONFIRM_MESSAGES["送金先口座申請"],
-          variant: "remittance-account",
         }}
         contractPredicate={(c) =>
           c.status === "確定済み" ||
