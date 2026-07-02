@@ -269,7 +269,7 @@ export default function EditApplicationPage() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <h3 className="font-medium text-orange-900 mb-1">不備内容</h3>
+                <h3 className="font-medium text-orange-900 mb-1">不備コメント</h3>
                 <p className="text-sm text-orange-800 whitespace-pre-wrap">{app.deficiencyMessage}</p>
               </div>
             </div>

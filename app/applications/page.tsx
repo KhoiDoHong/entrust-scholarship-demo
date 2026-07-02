@@ -136,7 +136,7 @@ export default function ApplicationsPage() {
   }
 
   const handleExportCSV = () => {
-    const headers = ["審査管理ID", "契約番号", "養成校名", "法人名・施設名", "学生名", "ステータス", "備考"]
+    const headers = ["審査管理ID", "契約番号", "養成校名", "法人名・施設名", "学生名", "ステータス", "コメント"]
 
     const csvData = filteredApplications.map((app) => [
       app.applicationNumber,
@@ -291,7 +291,7 @@ export default function ApplicationsPage() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">法人名・施設名</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">学生名</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-36">ステータス</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">備考</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">コメント</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-20">操作</th>
                 </tr>
               </thead>

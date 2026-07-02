@@ -109,7 +109,7 @@ export default function ApplicationDetailPage() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5" />
               <div>
-                <h3 className="text-orange-600 font-medium">不備内容</h3>
+                <h3 className="text-orange-600 font-medium">不備コメント</h3>
                 <p className="text-orange-600 text-sm mt-1">{data.deficiencyMessage}</p>
               </div>
             </div>

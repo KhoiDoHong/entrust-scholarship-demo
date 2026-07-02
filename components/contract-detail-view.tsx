@@ -208,7 +208,7 @@ export function ContractDetailView({
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
             <div>
-              <h3 className="text-orange-600 font-medium">差し戻し内容</h3>
+              <h3 className="text-orange-600 font-medium">差し戻しコメント</h3>
               <p className="text-orange-600 text-sm mt-1 whitespace-pre-wrap">{rejectionComment}</p>
             </div>
           </div>

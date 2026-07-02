@@ -464,7 +464,7 @@ export default function ContractManagementPage() {
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-28">ステータス</th>
                     {canEdit && <th className="text-center py-3 px-4 text-sm font-medium text-gray-500 w-32">各種変更</th>}
                     {canEdit && <th className="text-center py-3 px-4 text-sm font-medium text-gray-500 w-36">貸付金返還事</th>}
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 min-w-[12rem]">備考</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 min-w-[12rem]">コメント</th>
                     <th className="text-center py-3 px-4 text-sm font-medium text-gray-500 w-16">操作</th>
                   </tr>
                 </thead>

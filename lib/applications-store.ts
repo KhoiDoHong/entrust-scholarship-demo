@@ -19,7 +19,7 @@ export function getApplicationById(id: number): Application | undefined {
   return _applications.find((a) => a.id === id)
 }
 
-/** 一覧の備考列 — 修正済みは remarks、不備ありは不備内容 */
+/** 一覧の備考列 — 修正済みは remarks、不備ありは不備コメント */
 export function getApplicationRemarksDisplay(app: Application): string {
   if (app.statusType === "edited") {
     return (
@@ -38,7 +38,7 @@ export function hasApplicationRemarks(app: Application): boolean {
   return getApplicationRemarksDisplay(app).length > 0
 }
 
-/** 不備あり → 修正済み。備考 = 返信内容、空なら不備内容を引き継ぐ */
+/** 不備あり → 修正済み。備考 = 返信内容、空なら不備コメントを引き継ぐ */
 export function completeApplicationCorrection(
   id: number,
   replyComment: string
