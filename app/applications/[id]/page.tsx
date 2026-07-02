@@ -299,14 +299,12 @@ export default function ApplicationDetailPage() {
             </Card>
           </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-3">
-                やり取り履歴
-              </h2>
-              {exchangeHistory.length === 0 ? (
-                <p className="text-sm text-gray-500">やり取り履歴はありません。</p>
-              ) : (
+          {exchangeHistory.length > 0 && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-3">
+                  やり取り履歴
+                </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -344,9 +342,9 @@ export default function ApplicationDetailPage() {
                     </tbody>
                   </table>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </DashboardLayout>
