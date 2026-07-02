@@ -31,7 +31,12 @@ export interface Application {
   missingDocuments: string[]
   approvedDate?: string
   remarks?: string
-  exchanges?: { createdAt: string; createdByName: string; comment: string }[]
+  exchanges?: {
+    createdAt: string
+    createdByName: string
+    kind?: "deficiency" | "comment"
+    comment: string
+  }[]
   deficiencyMessage?: string
   applicant: {
     applicationDate: string
@@ -86,8 +91,8 @@ const DOC_APP = APPLICATION_DOCUMENT_LABELS.applicationForm
 const DOC_ID = APPLICATION_DOCUMENT_LABELS.idDocument
 
 export function demoDocumentFileName(docLabel: string): string {
-  if (docLabel === DOC_ID) return "???.pdf"
-  if (docLabel === DOC_APP) return "?????.pdf"
+  if (docLabel === DOC_ID) return "ID.pdf"
+  if (docLabel === DOC_APP) return "APP.pdf"
   return `${docLabel}.pdf`
 }
 

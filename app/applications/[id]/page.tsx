@@ -9,6 +9,10 @@ import { ApplicationStatusBadge } from "@/components/status-badge"
 import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 import { getApplicationById } from "@/lib/applications-store"
+import {
+  APPLICATION_EXCHANGE_KIND_LABELS,
+  getApplicationExchangeHistory,
+} from "@/lib/application-exchange-history"
 import { corpFacilityLabel } from "@/lib/contract-notifications"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -52,6 +56,8 @@ export default function ApplicationDetailPage() {
   }
 
   const status = app.status
+  const exchangeHistory = getApplicationExchangeHistory(app)
+
   const data = {
     applicationNumber: app.applicationNumber,
     status,
@@ -60,8 +66,6 @@ export default function ApplicationDetailPage() {
     student: app.student,
     school: app.school,
     documents: app.documents,
-    remarks: app.remarks,
-    exchanges: app.exchanges ?? [],
   }
 
   return (
@@ -103,14 +107,16 @@ export default function ApplicationDetailPage() {
           </div>
         </div>
 
-        {/* Deficiency Alert with Upload Button */}
-        {data.deficiencyMessage && (
+        {/* 不備あり — 最新の不備コメント（対応待ち） */}
+        {app.statusType === "warning" && data.deficiencyMessage && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5" />
               <div>
                 <h3 className="text-orange-600 font-medium">不備コメント</h3>
-                <p className="text-orange-600 text-sm mt-1">{data.deficiencyMessage}</p>
+                <p className="text-orange-600 text-sm mt-1 whitespace-pre-wrap">
+                  {data.deficiencyMessage}
+                </p>
               </div>
             </div>
           </div>
@@ -293,31 +299,54 @@ export default function ApplicationDetailPage() {
             </Card>
           </div>
 
-          {data.exchanges.length > 0 && (
-            <Card className="mt-6">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-3">やり取り履歴</h2>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-left text-gray-500">
-                      <th className="py-2 pr-4">日時</th>
-                      <th className="py-2 pr-4">登録者</th>
-                      <th className="py-2">内容</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.exchanges.map((ex, i) => (
-                      <tr key={i} className="border-b border-gray-100">
-                        <td className="py-3 pr-4 text-gray-600">{ex.createdAt}</td>
-                        <td className="py-3 pr-4 text-gray-900">{ex.createdByName}</td>
-                        <td className="py-3 text-gray-700">{ex.comment}</td>
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-3">
+                やり取り履歴
+              </h2>
+              {exchangeHistory.length === 0 ? (
+                <p className="text-sm text-gray-500">やり取り履歴はありません。</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-gray-500">
+                        <th className="py-2 pr-4 w-28">種別</th>
+                        <th className="py-2 pr-4 w-36">日時</th>
+                        <th className="py-2 pr-4 w-44">登録者</th>
+                        <th className="py-2">内容</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
-          )}
+                    </thead>
+                    <tbody>
+                      {exchangeHistory.map((ex, i) => (
+                        <tr key={i} className="border-b border-gray-100 align-top">
+                          <td className="py-3 pr-4">
+                            <span
+                              className={cn(
+                                "inline-flex px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap",
+                                ex.kind === "deficiency"
+                                  ? "bg-orange-100 text-orange-800"
+                                  : "bg-blue-100 text-blue-800"
+                              )}
+                            >
+                              {APPLICATION_EXCHANGE_KIND_LABELS[ex.kind]}
+                            </span>
+                          </td>
+                          <td className="py-3 pr-4 text-gray-600 whitespace-nowrap">
+                            {ex.createdAt}
+                          </td>
+                          <td className="py-3 pr-4 text-gray-900">{ex.createdByName}</td>
+                          <td className="py-3 text-gray-700 whitespace-pre-wrap">
+                            {ex.comment}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </DashboardLayout>

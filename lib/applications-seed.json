@@ -43,7 +43,21 @@
     },
     "statusKey": "edited",
     "statusType": "edited",
-    "remarks": "住所欄を修正しました。"
+    "remarks": "住所欄を修正しました。",
+    "exchanges": [
+      {
+        "createdAt": "2024年4月4日 14:30",
+        "createdByName": "イントラスト 審査担当",
+        "kind": "deficiency",
+        "comment": "住所の記載に誤りがあります。市区町村以降を確認してください。"
+      },
+      {
+        "createdAt": "2024年4月5日 09:15",
+        "createdByName": "東京介護福祉専門学校 山田",
+        "kind": "comment",
+        "comment": "住所欄を修正しました。"
+      }
+    ]
   },
   {
     "id": 3,
@@ -75,8 +89,9 @@
     "exchanges": [
       {
         "createdAt": "2024年4月6日 10:00",
-        "createdByName": "審査担当",
-        "comment": "身分証明書を再提出してください。"
+        "createdByName": "イントラスト 審査担当",
+        "kind": "deficiency",
+        "comment": "身分証明書の画像が不鮮明です。再提出をお願いします。\n\n確認事項:\n- 氏名・住所が読み取れること\n- 有効期限内であること"
       }
     ],
     "docs": {
@@ -210,6 +225,14 @@
     ],
     "remarks": "申込書の記入漏れがあります。\n\n確認事項:\n- 保証人欄の記入\n- 署名・押印の確認",
     "deficiencyMessage": "申込書の記入漏れがあります。",
+    "exchanges": [
+      {
+        "createdAt": "2024年4月7日 11:20",
+        "createdByName": "イントラスト 審査担当",
+        "kind": "deficiency",
+        "comment": "申込書の記入漏れがあります。\n\n確認事項:\n- 保証人欄の記入\n- 署名・押印の確認"
+      }
+    ],
     "docs": {
       "appSubmitted": false
     }
@@ -527,7 +550,21 @@
     },
     "statusKey": "edited",
     "statusType": "edited",
-    "remarks": "保証人欄の記入を完了しました。"
+    "remarks": "保証人欄の記入を完了しました。",
+    "exchanges": [
+      {
+        "createdAt": "2024年5月11日 15:00",
+        "createdByName": "イントラスト 審査担当",
+        "kind": "deficiency",
+        "comment": "申込書の保証人欄が未記入です。記入のうえ再提出してください。"
+      },
+      {
+        "createdAt": "2024年5月12日 10:30",
+        "createdByName": "東京介護福祉専門学校 山田",
+        "kind": "comment",
+        "comment": "保証人欄の記入を完了しました。"
+      }
+    ]
   },
   {
     "id": 22,
@@ -552,7 +589,21 @@
     },
     "statusKey": "edited",
     "statusType": "edited",
-    "remarks": "申込書の署名を追記しました。"
+    "remarks": "申込書の署名を追記しました。",
+    "exchanges": [
+      {
+        "createdAt": "2024年5月13日 09:45",
+        "createdByName": "イントラスト 審査担当",
+        "kind": "deficiency",
+        "comment": "申込書に署名・押印がありません。ご確認ください。"
+      },
+      {
+        "createdAt": "2024年5月14日 11:00",
+        "createdByName": "大阪介護福祉専門学校 担当",
+        "kind": "comment",
+        "comment": "申込書の署名を追記しました。"
+      }
+    ]
   },
   {
     "id": 35,

@@ -6,6 +6,7 @@ import {
   demoDocumentFileName,
   type Application,
 } from "@/lib/applications-data"
+import type { ApplicationExchangeEntry } from "@/lib/application-exchange-history"
 
 export type { Application }
 
@@ -55,12 +56,42 @@ export function completeApplicationCorrection(
     app.remarks?.trim() ||
     ""
 
+  const commentEntry: ApplicationExchangeEntry = {
+    createdAt: new Date().toLocaleString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    createdByName: app.school.schoolName,
+    kind: "comment",
+    comment: remarks,
+  }
+
+  const existingExchanges = app.exchanges ?? []
+  const hasDeficiencyInHistory = existingExchanges.some(
+    (e) => (e.kind ?? "comment") === "deficiency"
+  )
+  const deficiencyEntries: ApplicationExchangeEntry[] =
+    !hasDeficiencyInHistory && app.deficiencyMessage?.trim()
+      ? [
+          {
+            createdAt: app.school.receptionDate,
+            createdByName: "イントラスト 審査担当",
+            kind: "deficiency",
+            comment: app.deficiencyMessage.trim(),
+          },
+        ]
+      : []
+
   const updated: Application = {
     ...app,
     status: APPLICATION_STATUS_LABELS[2],
     statusType: "edited",
     missingDocuments: [],
     remarks,
+    exchanges: [...existingExchanges, ...deficiencyEntries, commentEntry],
     documents: app.documents.map((doc) => ({
       ...doc,
       submitted: true,
