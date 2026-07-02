@@ -3,7 +3,6 @@
 import { useMemo, useState, type ReactNode } from "react"
 import { Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   ContractNotificationFiltersPanel,
@@ -188,15 +187,15 @@ export function ContractNotificationListView({
                         )}
                         {showActionColumn && (
                           <td className="py-4 px-4">
-                            <Button
-                              variant="outline"
-                              size="icon"
+                            <button
+                              type="button"
                               onClick={() => onViewRow?.(row)}
-                              title="契約詳細"
-                              aria-label="契約詳細"
+                              title="詳細"
+                              aria-label="詳細"
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
                             >
                               <Eye className="w-4 h-4" />
-                            </Button>
+                            </button>
                           </td>
                         )}
                       </tr>

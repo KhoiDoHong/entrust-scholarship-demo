@@ -135,6 +135,10 @@ export function ContractDetailView({
   const contractNotices =
     notices?.[contract.id]?.length ? notices[contract.id]! : getPriorNotices(contract.id)
   const contractNoticesNewestFirst = [...contractNotices].reverse()
+  const canShowPriorNotices =
+    contract.status !== "確定待ち" &&
+    contract.status !== "取り下げ" &&
+    contract.status !== "キャンセル"
   const party = buildPartyDisplay(contract, app, remittanceAccount)
   const rejectionComment = getContractRemarksDisplay(contract)
   const [reviewComment, setReviewComment] = useState("")
@@ -164,7 +168,7 @@ export function ContractDetailView({
   }
 
   const priorNoticesSection =
-    contractNoticesNewestFirst.length > 0 ? (
+    canShowPriorNotices && contractNoticesNewestFirst.length > 0 ? (
       <Card>
         <CardContent className="p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-3">事前通知</h2>

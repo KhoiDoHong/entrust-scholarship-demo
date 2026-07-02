@@ -219,15 +219,15 @@ export default function ConfirmedThisMonthPage() {
                       <td className="py-4 px-4 text-sm text-gray-900">{app.studentName}</td>
                       <td className="py-4 px-4 text-sm text-gray-500">{app.confirmedDate}</td>
                       <td className="py-4 px-4">
-                        <Button
-                          variant="outline"
-                          size="icon"
+                        <button
+                          type="button"
                           onClick={() => openContractDetail(app)}
-                          title="契約詳細"
-                          aria-label="契約詳細"
+                          title="詳細"
+                          aria-label="詳細"
+                          className="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
                         >
                           <Eye className="w-4 h-4" />
-                        </Button>
+                        </button>
                       </td>
                     </tr>
                   ))
