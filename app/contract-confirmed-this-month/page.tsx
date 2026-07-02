@@ -5,7 +5,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { RotateCcw } from "lucide-react"
+import { Eye, RotateCcw } from "lucide-react"
 import { getAuthenticatedSession, type UserAccount } from "@/lib/auth"
 import {
   confirmedThisMonth,
@@ -19,12 +19,15 @@ import {
   getContractNotificationState,
   subscribeContractNotifications,
   withdrawConfirmedThisMonth,
+  getConfirmedContracts,
+  type ConfirmedContract,
 } from "@/lib/contracts-store"
 import {
   ContractNotificationFiltersPanel,
   ListResultCount,
 } from "@/components/contract-notification-filters"
 import { ListPagination } from "@/components/list-pagination"
+import { ContractDetailView } from "@/components/contract-detail-view"
 
 export default function ConfirmedThisMonthPage() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
@@ -33,6 +36,7 @@ export default function ConfirmedThisMonthPage() {
   const [filters, setFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
   const [appliedFilters, setAppliedFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedContract, setSelectedContract] = useState<ConfirmedContract | null>(null)
 
   useEffect(() => {
     setCurrentUser(getAuthenticatedSession())
@@ -95,6 +99,29 @@ export default function ConfirmedThisMonthPage() {
     setCurrentPage(1)
   }, [])
 
+  const openContractDetail = useCallback((row: (typeof confirmedList)[number]) => {
+    const existing = getConfirmedContracts().find(
+      (c) =>
+        c.contractNumber === row.contractNumber ||
+        c.applicationNumber === row.applicationNumber
+    )
+    if (existing) {
+      setSelectedContract(existing)
+      return
+    }
+    setSelectedContract({
+      id: row.id,
+      applicationNumber: row.applicationNumber,
+      contractNumber: row.contractNumber,
+      corporationName: row.corporationName,
+      facilityName: row.facilityName,
+      studentName: row.studentName,
+      approvedDate: row.approvedDate,
+      confirmedDate: row.confirmedDate ?? "",
+      status: "確定済み",
+    })
+  }, [confirmedList])
+
   if (!currentUser) {
     return (
       <DashboardLayout>
@@ -107,6 +134,18 @@ export default function ConfirmedThisMonthPage() {
     return (
       <DashboardLayout>
         <div className="p-8 text-center text-gray-500">このページへのアクセス権限がありません。</div>
+      </DashboardLayout>
+    )
+  }
+
+  if (selectedContract) {
+    return (
+      <DashboardLayout>
+        <ContractDetailView
+          contract={selectedContract}
+          onBack={() => setSelectedContract(null)}
+          backLabel="今月確定通知一覧に戻る"
+        />
       </DashboardLayout>
     )
   }
@@ -157,6 +196,7 @@ export default function ConfirmedThisMonthPage() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">契約連帯保証人</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">契約者</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-36">契約確定日</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-24">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,11 +218,22 @@ export default function ConfirmedThisMonthPage() {
                       <td className="py-4 px-4 text-sm text-gray-900">{corpFacilityLabel(app)}</td>
                       <td className="py-4 px-4 text-sm text-gray-900">{app.studentName}</td>
                       <td className="py-4 px-4 text-sm text-gray-500">{app.confirmedDate}</td>
+                      <td className="py-4 px-4">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => openContractDetail(app)}
+                          title="契約詳細"
+                          aria-label="契約詳細"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-gray-500">
+                    <td colSpan={6} className="py-8 text-center text-gray-500">
                       今月の確定通知済み契約はありません
                     </td>
                   </tr>

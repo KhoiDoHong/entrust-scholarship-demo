@@ -1,7 +1,9 @@
 "use client"
 
 import { useMemo, useState, type ReactNode } from "react"
+import { Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   ContractNotificationFiltersPanel,
@@ -34,6 +36,8 @@ interface ContractNotificationListViewProps {
   showStatusFilter?: boolean
   showStatusColumn?: boolean
   renderStatusCell?: (row: ContractNotificationRow) => ReactNode
+  showActionColumn?: boolean
+  onViewRow?: (row: ContractNotificationRow) => void
   selection?: {
     enabled: boolean
     selectedIds: number[]
@@ -56,6 +60,8 @@ export function ContractNotificationListView({
   showStatusFilter = false,
   showStatusColumn = false,
   renderStatusCell,
+  showActionColumn = false,
+  onViewRow,
   selection,
   footer,
 }: ContractNotificationListViewProps) {
@@ -87,7 +93,10 @@ export function ContractNotificationListView({
   )
 
   const columnCount =
-    3 + (showStatusColumn ? 1 : 0) + (selection?.enabled ? 1 : 0)
+    3 +
+    (showStatusColumn ? 1 : 0) +
+    (showActionColumn ? 1 : 0) +
+    (selection?.enabled ? 1 : 0)
 
   return (
     <div>
@@ -141,6 +150,11 @@ export function ContractNotificationListView({
                       ステータス
                     </th>
                   )}
+                  {showActionColumn && (
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-24">
+                      操作
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -171,6 +185,19 @@ export function ContractNotificationListView({
                         <td className="py-4 px-4 text-sm text-gray-900">{row.studentName}</td>
                         {showStatusColumn && renderStatusCell && (
                           <td className="py-4 px-4">{renderStatusCell(row)}</td>
+                        )}
+                        {showActionColumn && (
+                          <td className="py-4 px-4">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => onViewRow?.(row)}
+                              title="契約詳細"
+                              aria-label="契約詳細"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </td>
                         )}
                       </tr>
                     )

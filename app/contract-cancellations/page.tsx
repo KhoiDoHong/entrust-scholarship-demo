@@ -13,14 +13,18 @@ import {
 import {
   getContractNotificationState,
   subscribeContractNotifications,
+  getConfirmedContracts,
+  type ConfirmedContract,
 } from "@/lib/contracts-store"
 import { ContractNotificationListView } from "@/components/contract-notification-list-view"
+import { ContractDetailView } from "@/components/contract-detail-view"
 
 export default function ContractCancellationsPage() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
   const [notificationState, setNotificationState] = useState(getContractNotificationState)
   const [filters, setFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
   const [appliedFilters, setAppliedFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
+  const [selectedContract, setSelectedContract] = useState<ConfirmedContract | null>(null)
 
   useEffect(() => {
     setCurrentUser(getAuthenticatedSession())
@@ -45,6 +49,41 @@ export default function ContractCancellationsPage() {
     setAppliedFilters({ ...EMPTY_CONTRACT_FILTERS })
   }, [])
 
+  const openContractDetail = useCallback((row: (typeof cancelledList)[number]) => {
+    const existing = getConfirmedContracts().find(
+      (c) =>
+        c.contractNumber === row.contractNumber ||
+        c.applicationNumber === row.applicationNumber
+    )
+    if (existing) {
+      setSelectedContract(existing)
+      return
+    }
+    setSelectedContract({
+      id: row.id,
+      applicationNumber: row.applicationNumber,
+      contractNumber: row.contractNumber,
+      corporationName: row.corporationName,
+      facilityName: row.facilityName,
+      studentName: row.studentName,
+      approvedDate: row.approvedDate,
+      confirmedDate: "",
+      status: "取り下げ",
+    })
+  }, [])
+
+  if (selectedContract) {
+    return (
+      <DashboardLayout>
+        <ContractDetailView
+          contract={selectedContract}
+          onBack={() => setSelectedContract(null)}
+          backLabel="契約キャンセル一覧に戻る"
+        />
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout>
       <ContractNotificationListView
@@ -56,6 +95,8 @@ export default function ContractCancellationsPage() {
         onFiltersChange={setFilters}
         onApply={handleSearch}
         onClear={handleClear}
+        showActionColumn
+        onViewRow={openContractDetail}
       />
     </DashboardLayout>
   )

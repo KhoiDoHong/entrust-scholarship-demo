@@ -18,8 +18,11 @@ import {
   subscribeContractNotifications,
   confirmPendingContracts,
   cancelPendingContracts,
+  getConfirmedContracts,
+  type ConfirmedContract,
 } from "@/lib/contracts-store"
 import { ContractNotificationListView } from "@/components/contract-notification-list-view"
+import { ContractDetailView } from "@/components/contract-detail-view"
 import {
   SubmitConfirmDialog,
   SUBMIT_CONFIRM_MESSAGES,
@@ -34,6 +37,7 @@ export default function ContractConfirmationPage() {
   const [filters, setFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
   const [appliedFilters, setAppliedFilters] = useState<ContractNotificationFilters>({ ...EMPTY_CONTRACT_FILTERS })
   const [pendingAction, setPendingAction] = useState<PendingConfirmAction>(null)
+  const [selectedContract, setSelectedContract] = useState<ConfirmedContract | null>(null)
 
   useEffect(() => {
     setCurrentUser(getAuthenticatedSession())
@@ -104,6 +108,29 @@ export default function ContractConfirmationPage() {
     setAppliedFilters({ ...EMPTY_CONTRACT_FILTERS })
   }, [])
 
+  const openContractDetail = useCallback((row: (typeof visiblePendingRows)[number]) => {
+    const existing = getConfirmedContracts().find(
+      (c) =>
+        c.contractNumber === row.contractNumber ||
+        c.applicationNumber === row.applicationNumber
+    )
+    if (existing) {
+      setSelectedContract(existing)
+      return
+    }
+    setSelectedContract({
+      id: row.id,
+      applicationNumber: row.applicationNumber,
+      contractNumber: row.contractNumber,
+      corporationName: row.corporationName,
+      facilityName: row.facilityName,
+      studentName: row.studentName,
+      approvedDate: row.approvedDate,
+      confirmedDate: "",
+      status: notificationState.withdrawnPendingIds.includes(row.id) ? "取り下げ" : "確定済み",
+    })
+  }, [notificationState.withdrawnPendingIds])
+
   if (!currentUser) {
     return (
       <DashboardLayout>
@@ -116,6 +143,18 @@ export default function ContractConfirmationPage() {
     return (
       <DashboardLayout>
         <div className="p-8 text-center text-gray-500">このページへのアクセス権限がありません。</div>
+      </DashboardLayout>
+    )
+  }
+
+  if (selectedContract) {
+    return (
+      <DashboardLayout>
+        <ContractDetailView
+          contract={selectedContract}
+          onBack={() => setSelectedContract(null)}
+          backLabel="契約確定通知に戻る"
+        />
       </DashboardLayout>
     )
   }
@@ -139,6 +178,8 @@ export default function ContractConfirmationPage() {
         onClear={handleClear}
         showStatusFilter
         showStatusColumn
+        showActionColumn
+        onViewRow={openContractDetail}
         renderStatusCell={(row) =>
           notificationState.withdrawnPendingIds.includes(row.id) ? (
             <ContractStatusBadge status="取り下げ" />
