@@ -55,11 +55,7 @@ export default function ContractCancellationsPage() {
         c.contractNumber === row.contractNumber ||
         c.applicationNumber === row.applicationNumber
     )
-    if (existing) {
-      setSelectedContract(existing)
-      return
-    }
-    setSelectedContract({
+    const base: ConfirmedContract = existing ?? {
       id: row.id,
       applicationNumber: row.applicationNumber,
       contractNumber: row.contractNumber,
@@ -68,7 +64,11 @@ export default function ContractCancellationsPage() {
       studentName: row.studentName,
       approvedDate: row.approvedDate,
       confirmedDate: "",
-      status: "取り下げ",
+      status: "確定済み",
+    }
+    setSelectedContract({
+      ...base,
+      status: "キャンセル",
     })
   }, [])
 

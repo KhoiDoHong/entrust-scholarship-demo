@@ -114,11 +114,7 @@ export default function ContractConfirmationPage() {
         c.contractNumber === row.contractNumber ||
         c.applicationNumber === row.applicationNumber
     )
-    if (existing) {
-      setSelectedContract(existing)
-      return
-    }
-    setSelectedContract({
+    const base: ConfirmedContract = existing ?? {
       id: row.id,
       applicationNumber: row.applicationNumber,
       contractNumber: row.contractNumber,
@@ -127,7 +123,11 @@ export default function ContractConfirmationPage() {
       studentName: row.studentName,
       approvedDate: row.approvedDate,
       confirmedDate: "",
-      status: notificationState.withdrawnPendingIds.includes(row.id) ? "取り下げ" : "確定済み",
+      status: "確定済み",
+    }
+    setSelectedContract({
+      ...base,
+      status: notificationState.withdrawnPendingIds.includes(row.id) ? "取り下げ" : "確定待ち",
     })
   }, [notificationState.withdrawnPendingIds])
 

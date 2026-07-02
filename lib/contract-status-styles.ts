@@ -11,6 +11,7 @@ import {
 
 export const DASHBOARD_CONTRACT_STATUSES = [
   "確定待ち",
+  "キャンセル",
   "確定済み",
   "代位弁済依頼中",
   "弁済依頼確認済み",
@@ -36,6 +37,13 @@ export const CONTRACT_STATUS_STYLES: Record<string, ContractStatusStyle> = {
     bgColor: "bg-yellow-50",
     label: "確定待ち",
     container: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  },
+  "キャンセル": {
+    icon: XCircle,
+    iconColor: "text-red-500",
+    bgColor: "bg-red-50",
+    label: "キャンセル",
+    container: "bg-red-50 text-red-600 border-red-200",
   },
   "確定済み": {
     icon: CheckCircle2,

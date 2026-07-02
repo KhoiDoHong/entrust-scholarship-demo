@@ -105,11 +105,7 @@ export default function ConfirmedThisMonthPage() {
         c.contractNumber === row.contractNumber ||
         c.applicationNumber === row.applicationNumber
     )
-    if (existing) {
-      setSelectedContract(existing)
-      return
-    }
-    setSelectedContract({
+    const base: ConfirmedContract = existing ?? {
       id: row.id,
       applicationNumber: row.applicationNumber,
       contractNumber: row.contractNumber,
@@ -119,8 +115,12 @@ export default function ConfirmedThisMonthPage() {
       approvedDate: row.approvedDate,
       confirmedDate: row.confirmedDate ?? "",
       status: "確定済み",
+    }
+    setSelectedContract({
+      ...base,
+      status: "確定済み",
     })
-  }, [confirmedList])
+  }, [])
 
   if (!currentUser) {
     return (

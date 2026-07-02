@@ -5,6 +5,7 @@ import { approvedApps, confirmedThisMonth } from "@/lib/contract-notifications"
 import { CONTRACT_NOTIFICATION_SEED_CANCELLED_IDS } from "@/lib/contract-notification-constants"
 
 export type ContractStatus =
+  | "キャンセル"
   | "確定済み"
   | "代位弁済依頼中"
   | "弁済依頼確認済み"
