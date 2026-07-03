@@ -871,7 +871,7 @@ export default function ContractManagementPage() {
                 onClick={handleCompletedPayment}
                 className="bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white"
               >
-                報告する
+                確認する
               </Button>
             </div>
           </div>

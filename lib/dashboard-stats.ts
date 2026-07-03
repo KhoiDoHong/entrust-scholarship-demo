@@ -36,7 +36,9 @@ export function getDashboardApplicationCounts(user: UserAccount | null): Record<
 
 export function getDashboardContractCounts(user: UserAccount | null): Record<string, number> {
   const visible = filterContractsByRole(
-    getConfirmedContracts().filter((c) => c.status !== "取り下げ"),
+    getConfirmedContracts().filter(
+      (c) => c.status !== "取り下げ" && c.status !== "キャンセル"
+    ),
     user
   )
   const counts = Object.fromEntries(

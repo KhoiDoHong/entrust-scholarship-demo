@@ -99,7 +99,6 @@ export function ContractManagementListView({
   const [accountNumberAfter, setAccountNumberAfter] = useState("")
   const [accountHolderAfter, setAccountHolderAfter] = useState("")
   const [accountHolderKanaAfter, setAccountHolderKanaAfter] = useState("")
-  const [applyConfirmOpen, setApplyConfirmOpen] = useState(false)
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
 
@@ -181,7 +180,6 @@ export function ContractManagementListView({
     setAccountNumberAfter("")
     setAccountHolderAfter("")
     setAccountHolderKanaAfter("")
-    setApplyConfirmOpen(false)
   }
 
   const handleJobcanSave = () => {
@@ -190,16 +188,10 @@ export function ContractManagementListView({
       updateContract(jobcanDialogContract.id, { jobcan: jobcanAfter.trim() || undefined })
       setContracts([...getConfirmedContracts()])
     }
-    setApplyConfirmOpen(false)
     closeJobcanDialog()
   }
 
   const handleJobcanSubmitClick = () => {
-    if (!jobcanDialogContract) return
-    if (applyDialog) {
-      setApplyConfirmOpen(true)
-      return
-    }
     handleJobcanSave()
   }
 
@@ -705,16 +697,6 @@ export function ContractManagementListView({
             </div>
           </div>
         </div>
-      )}
-
-      {applyConfirmOpen && applyDialog && (
-        <SubmitConfirmDialog
-          open={applyConfirmOpen}
-          title={applyDialog.title}
-          message={applyDialog.confirmMessage}
-          onCancel={() => setApplyConfirmOpen(false)}
-          onConfirm={handleJobcanSave}
-        />
       )}
 
       {bulkConfirmOpen && acknowledgeWorkflowKey && (

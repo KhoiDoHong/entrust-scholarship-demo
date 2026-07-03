@@ -16,7 +16,7 @@ export function SubmitConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = "申請する",
+  confirmLabel = "確認する",
   onCancel,
   onConfirm,
 }: SubmitConfirmDialogProps) {

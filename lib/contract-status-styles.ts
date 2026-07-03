@@ -11,7 +11,6 @@ import {
 
 export const DASHBOARD_CONTRACT_STATUSES = [
   "確定待ち",
-  "キャンセル",
   "確定済み",
   "代位弁済依頼中",
   "弁済依頼確認済み",
