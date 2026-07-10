@@ -19,7 +19,7 @@ export const approvedApps = (() => {
 
 export const confirmedThisMonth = approvedApps.map((a, i) => ({
   ...a,
-  confirmedDate: `2024年5月${10 + i}日`,
+  confirmedDate: `2024-05-${String(10 + i).padStart(2, "0")}`,
 }))
 
 export type ContractNotificationFilters = {

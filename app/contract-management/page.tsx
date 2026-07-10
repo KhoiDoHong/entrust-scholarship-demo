@@ -65,7 +65,7 @@ function getContractEnrollmentDate(contract: ConfirmedContract): string {
     applications.find(
       (a) => a.contractNumber === contract.contractNumber && a.contractNumber !== "-"
     )?.student.enrollmentDate ??
-    "2024年4月1日"
+    "2024-04-01"
   return formatEnrollmentDateDisplay(raw)
 }
 

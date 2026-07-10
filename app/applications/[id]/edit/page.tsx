@@ -274,7 +274,7 @@ export default function EditApplicationPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="replyComment">コメント</Label>
+              <Label htmlFor="replyComment">返信コメント</Label>
               <Textarea
                 id="replyComment"
                 placeholder="コメントを入力してください（任意）"

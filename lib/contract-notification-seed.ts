@@ -1,5 +1,6 @@
 import type { Application } from "@/lib/applications-data"
 import { findFacilityApplicantUserId } from "@/lib/masters"
+import { toISODateString } from "@/lib/utils"
 
 type ApprovedSeed = {
   id: number
@@ -15,6 +16,7 @@ type ApprovedSeed = {
 
 function makeApprovedApp(seed: ApprovedSeed): Application {
   const [lastName, firstName] = seed.studentName.split(" ")
+  const approvedDate = toISODateString(seed.approvedDate)
   return {
     id: seed.id,
     applicationNumber: seed.applicationNumber,
@@ -26,9 +28,9 @@ function makeApprovedApp(seed: ApprovedSeed): Application {
     status: "承認",
     statusType: "approved",
     missingDocuments: [],
-    approvedDate: seed.approvedDate,
+    approvedDate,
     applicant: {
-      applicationDate: seed.approvedDate,
+      applicationDate: approvedDate,
       userId: findFacilityApplicantUserId(seed.corporationName, seed.facilityName),
       corporationName: seed.corporationName,
       facilityName: seed.facilityName,
@@ -46,14 +48,14 @@ function makeApprovedApp(seed: ApprovedSeed): Application {
       lastNameKana: "セイ",
       firstNameKana: "メイ",
       nationality: "日本",
-      birthDate: "2002年1月1日",
+      birthDate: "2002-01-01",
       gender: "女",
       phone: "090-0000-0000",
       email: `student${seed.id}@example.com`,
-      enrollmentDate: "2024年4月1日",
+      enrollmentDate: "2024-04-01",
     },
     school: {
-      receptionDate: seed.approvedDate,
+      receptionDate: approvedDate,
       kaiyokyoMemberNumber: seed.kaiyokyoMemberNumber,
       schoolName: seed.schoolName,
       receptionStaffName: "受付 担当",

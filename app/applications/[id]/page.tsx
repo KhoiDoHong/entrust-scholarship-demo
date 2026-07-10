@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { ArrowLeft, FileText, Check, AlertCircle, Upload, Plus, X } from "lucide-react"
 import { formatEnrollmentDateDisplay } from "@/lib/application-wizard-shared"
+import { formatDateDisplay, formatDateTimeDisplay } from "@/lib/utils"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ApplicationStatusBadge } from "@/components/status-badge"
@@ -134,7 +135,7 @@ export default function ApplicationDetailPage() {
                 <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                   <div className="col-span-2">
                     <p className="text-sm text-gray-500 mb-1">申込日</p>
-                    <p className="text-gray-900">{data.applicant.applicationDate}</p>
+                    <p className="text-gray-900">{formatDateDisplay(data.applicant.applicationDate)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">利用者ID</p>
@@ -196,7 +197,7 @@ export default function ApplicationDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">生年月日</p>
-                    <p className="text-gray-900">{data.student.birthDate}</p>
+                    <p className="text-gray-900">{formatDateDisplay(data.student.birthDate)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">性別</p>
@@ -229,7 +230,7 @@ export default function ApplicationDetailPage() {
                 <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                   <div>
                     <p className="text-sm text-gray-500 mb-1">受付日</p>
-                    <p className="text-gray-900">{data.school.receptionDate}</p>
+                    <p className="text-gray-900">{formatDateDisplay(data.school.receptionDate)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">介養協 会員番号</p>
@@ -331,7 +332,7 @@ export default function ApplicationDetailPage() {
                             </span>
                           </td>
                           <td className="py-3 pr-4 text-gray-600 whitespace-nowrap">
-                            {ex.createdAt}
+                            {formatDateTimeDisplay(ex.createdAt)}
                           </td>
                           <td className="py-3 pr-4 text-gray-900">{ex.createdByName}</td>
                           <td className="py-3 text-gray-700 whitespace-pre-wrap">

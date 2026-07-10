@@ -7,6 +7,7 @@ import {
   type Application,
 } from "@/lib/applications-data"
 import type { ApplicationExchangeEntry } from "@/lib/application-exchange-history"
+import { getNowDateTimeDisplay, toISODateString } from "@/lib/utils"
 
 export type { Application }
 
@@ -57,13 +58,7 @@ export function completeApplicationCorrection(
     ""
 
   const commentEntry: ApplicationExchangeEntry = {
-    createdAt: new Date().toLocaleString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    createdAt: getNowDateTimeDisplay(),
     createdByName: app.school.schoolName,
     kind: "comment",
     comment: remarks,
@@ -77,7 +72,7 @@ export function completeApplicationCorrection(
     !hasDeficiencyInHistory && app.deficiencyMessage?.trim()
       ? [
           {
-            createdAt: app.school.receptionDate,
+            createdAt: toISODateString(app.school.receptionDate),
             createdByName: "イントラスト 審査担当",
             kind: "deficiency",
             comment: app.deficiencyMessage.trim(),

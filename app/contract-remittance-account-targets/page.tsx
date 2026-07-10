@@ -15,9 +15,9 @@ export default function ContractRemittanceAccountTargetsPage() {
         showBulkReject={false}
         acknowledgeWorkflowKey="remittance-account"
         applyDialog={{
-          title: "送金先口座申請",
-          submitLabel: "申請",
-          confirmMessage: SUBMIT_CONFIRM_MESSAGES["送金先口座申請"],
+          title: "ジョブカン編集",
+          submitLabel: "保存",
+          confirmMessage: SUBMIT_CONFIRM_MESSAGES["ジョブカン編集"],
         }}
         contractPredicate={(c) =>
           c.status === "確定済み" ||

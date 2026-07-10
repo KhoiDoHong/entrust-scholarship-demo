@@ -15,9 +15,9 @@ export default function ContractStaffChangeTargetsPage() {
         showBulkReject={false}
         acknowledgeWorkflowKey="staff-change"
         applyDialog={{
-          title: "担当者情報変更",
-          submitLabel: "申請",
-          confirmMessage: SUBMIT_CONFIRM_MESSAGES["担当者情報変更"],
+          title: "ジョブカン編集",
+          submitLabel: "保存",
+          confirmMessage: SUBMIT_CONFIRM_MESSAGES["ジョブカン編集"],
         }}
         contractPredicate={(c) => c.status === "確定済み"}
       />

@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label"
 import type { Application } from "@/lib/applications-data"
 import type { UserAccount } from "@/lib/auth"
+import { formatDateDisplay, getTodayISO, toISODateString } from "@/lib/utils"
 import { getCorporationsForSchool } from "@/lib/data-scope"
 import {
   FACILITY_APPLICANTS,
@@ -90,12 +91,7 @@ export type ApplicationFormData = {
 export type UploadedFileMap = Record<string, { name: string; size: string } | undefined>
 
 export function getJapanTodayISO(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date())
+  return getTodayISO()
 }
 
 export function createEmptyFormData(options?: { useTodayDates?: boolean }): ApplicationFormData {
@@ -132,34 +128,9 @@ export function createEmptyFormData(options?: { useTodayDates?: boolean }): Appl
   }
 }
 
-function parseDemoDate(value: string): string {
-  const full = value.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-  if (full) {
-    const [, y, m, d] = full
-    return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`
-  }
-  const yearMonth = value.match(/(\d{4})年(\d{1,2})月$/)
-  if (yearMonth) {
-    const [, y, m] = yearMonth
-    return `${y}-${m.padStart(2, "0")}-01`
-  }
-  return value
-}
-
-/** ISO / 和暦 → 入学日表示（年月日） */
+/** ISO YYYY-MM-DD display for date fields */
 export function formatEnrollmentDateDisplay(value: string): string {
-  if (!value?.trim()) return "—"
-  const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-  if (iso) {
-    const [, y, m, d] = iso
-    return `${y}年${Number(m)}月${Number(d)}日`
-  }
-  const yearMonthOnly = value.match(/^(\d{4})年(\d{1,2})月$/)
-  if (yearMonthOnly) {
-    const [, y, m] = yearMonthOnly
-    return `${y}年${Number(m)}月1日`
-  }
-  return value
+  return formatDateDisplay(value)
 }
 
 function findFacilityApplicant(applicant: Application["applicant"]) {
@@ -203,7 +174,7 @@ export function mapApplicationToWizardState(app: Application): {
     schoolId: school?.schoolId ?? "",
     uploadedFiles,
     formData: {
-      applicationDate: parseDemoDate(app.applicant.applicationDate),
+      applicationDate: toISODateString(app.applicant.applicationDate),
       userId: app.applicant.userId,
       contactName: app.applicant.contactName,
       contactNameKana: app.applicant.contactNameKana,
@@ -218,12 +189,12 @@ export function mapApplicationToWizardState(app: Application): {
       studentLastNameKana: app.student.lastNameKana,
       studentFirstNameKana: app.student.firstNameKana,
       nationality: app.student.nationality,
-      studentBirthDate: parseDemoDate(app.student.birthDate),
+      studentBirthDate: toISODateString(app.student.birthDate),
       studentGender: parseGender(app.student.gender),
       studentPhone: app.student.phone,
       studentEmail: app.student.email,
-      enrollmentDate: parseDemoDate(app.student.enrollmentDate),
-      receptionDate: parseDemoDate(app.school.receptionDate),
+      enrollmentDate: toISODateString(app.student.enrollmentDate),
+      receptionDate: toISODateString(app.school.receptionDate),
       schoolId: school?.schoolId ?? "",
       associationMemberNumber: school?.associationMemberNumber ?? app.school.kaiyokyoMemberNumber,
       receptionStaffName: app.school.receptionStaffName,

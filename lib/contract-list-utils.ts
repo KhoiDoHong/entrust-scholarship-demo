@@ -45,8 +45,13 @@ export function applyContractListFilters(
 export function getContractYears(contracts: ConfirmedContract[]): string[] {
   const years = new Set<string>()
   contracts.forEach((c) => {
-    const match = c.confirmedDate.match(/(\d{4})年/)
-    if (match) years.add(match[1])
+    const isoMatch = c.confirmedDate.match(/^(\d{4})-/)
+    if (isoMatch) {
+      years.add(isoMatch[1])
+      return
+    }
+    const jpMatch = c.confirmedDate.match(/(\d{4})年/)
+    if (jpMatch) years.add(jpMatch[1])
   })
   return Array.from(years).sort((a, b) => Number(b) - Number(a))
 }

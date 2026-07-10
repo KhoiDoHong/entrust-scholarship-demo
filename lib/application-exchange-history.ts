@@ -1,4 +1,5 @@
 import type { Application } from "@/lib/applications-data"
+import { formatDateTimeDisplay, toISODateString } from "@/lib/utils"
 
 export type ApplicationExchangeKind = "deficiency" | "comment"
 
@@ -7,7 +8,7 @@ export const APPLICATION_EXCHANGE_KIND_LABELS: Record<
   string
 > = {
   deficiency: "不備コメント",
-  comment: "コメント",
+  comment: "返信コメント",
 }
 
 export interface ApplicationExchangeEntry {
@@ -21,7 +22,7 @@ function normalizeEntry(
   raw: NonNullable<Application["exchanges"]>[number]
 ): ApplicationExchangeEntry {
   return {
-    createdAt: raw.createdAt,
+    createdAt: formatDateTimeDisplay(raw.createdAt),
     createdByName: raw.createdByName,
     kind: raw.kind ?? "comment",
     comment: raw.comment,
@@ -40,7 +41,7 @@ export function getApplicationExchangeHistory(
 
   if (app.deficiencyMessage?.trim()) {
     entries.push({
-      createdAt: app.school.receptionDate,
+      createdAt: toISODateString(app.school.receptionDate),
       createdByName: "イントラスト 審査担当",
       kind: "deficiency",
       comment: app.deficiencyMessage.trim(),
@@ -51,7 +52,7 @@ export function getApplicationExchangeHistory(
     const remarks = app.remarks.trim()
     if (remarks !== app.deficiencyMessage?.trim()) {
       entries.push({
-        createdAt: app.school.receptionDate,
+        createdAt: toISODateString(app.school.receptionDate),
         createdByName: app.school.schoolName,
         kind: "comment",
         comment: remarks,

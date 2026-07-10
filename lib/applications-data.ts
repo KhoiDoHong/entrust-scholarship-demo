@@ -8,6 +8,7 @@ import {
   APPLICATION_STATUS_LABELS,
   type ApplicationStatusLabel,
 } from "@/lib/application-status-styles"
+import { formatDateTimeDisplay, toISODateString } from "@/lib/utils"
 import seedRecords from "@/lib/applications-seed.json"
 
 export type StatusType =
@@ -100,9 +101,9 @@ const DEFAULTS = {
   prefecture: "\u6771\u4EAC\u90FD",
   address: "\u5343\u4EE3\u7530\u533A\u4E38\u306E\u51851-1-1",
   nationality: "\u65E5\u672C",
-  birthDate: "2002\u5E744\u67081\u65E5",
+  birthDate: "2002-04-01",
   gender: "\u5973",
-  enrollmentDate: "2024\u5E744\u67081\u65E5",
+  enrollmentDate: "2024-04-01",
 } as const
 
 function fac(userId: string) {
@@ -132,7 +133,7 @@ function schoolBlock(
         ? FUKUOKA_META
         : NAGOYA_META
   return {
-    receptionDate,
+    receptionDate: toISODateString(receptionDate),
     kaiyokyoMemberNumber,
     schoolName: meta.schoolName,
     receptionStaffName: meta.receptionStaffName,
@@ -202,7 +203,7 @@ function makeApp(opts: ApplicationSeed): Application {
     status,
     statusType: opts.statusType,
     missingDocuments,
-    approvedDate: opts.approvedDate,
+    approvedDate: opts.approvedDate ? toISODateString(opts.approvedDate) : undefined,
     remarks:
       opts.statusType === "edited"
         ? opts.remarks?.trim() ||
@@ -210,9 +211,12 @@ function makeApp(opts: ApplicationSeed): Application {
           "\u4FEE\u6B63\u5B8C\u4E86"
         : opts.remarks,
     deficiencyMessage,
-    exchanges: opts.exchanges,
+    exchanges: opts.exchanges?.map((ex) => ({
+      ...ex,
+      createdAt: formatDateTimeDisplay(ex.createdAt),
+    })),
     applicant: {
-      applicationDate: opts.applicationDate,
+      applicationDate: toISODateString(opts.applicationDate),
       userId: f.userId,
       corporationName: f.corporationName,
       facilityName: f.facilityName,
@@ -230,11 +234,11 @@ function makeApp(opts: ApplicationSeed): Application {
       lastNameKana: st.lastNameKana,
       firstNameKana: st.firstNameKana,
       nationality: DEFAULTS.nationality,
-      birthDate: st.birthDate ?? DEFAULTS.birthDate,
+      birthDate: toISODateString(st.birthDate ?? DEFAULTS.birthDate),
       gender: st.gender ?? DEFAULTS.gender,
       phone: st.phone ?? "090-0000-0000",
       email: st.email ?? "student@example.com",
-      enrollmentDate: DEFAULTS.enrollmentDate,
+      enrollmentDate: toISODateString(DEFAULTS.enrollmentDate),
     },
     school: schoolBlock(
       opts.schoolKey,

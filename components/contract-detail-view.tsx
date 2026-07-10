@@ -21,6 +21,7 @@ import { getPriorNotices, type ConfirmedContract } from "@/lib/contracts-store"
 import type { Application } from "@/lib/applications-data"
 import { getApplications } from "@/lib/applications-store"
 import type { CorporationMasterRecord } from "@/lib/corporation-master-data"
+import { formatDateDisplay } from "@/lib/utils"
 
 function findApplicationForContract(
   contract: ConfirmedContract
@@ -178,7 +179,7 @@ export function ContractDetailView({
                 key={`${n.date}-${i}`}
                 className="border border-gray-100 rounded-lg p-4 bg-gray-50"
               >
-                <p className="text-xs text-gray-400 mb-2">{n.date}</p>
+                <p className="text-xs text-gray-400 mb-2">{formatDateDisplay(n.date)}</p>
                 <p className="text-sm text-gray-700 whitespace-pre-wrap">{n.text}</p>
               </div>
             ))}

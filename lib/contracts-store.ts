@@ -3,6 +3,7 @@
 
 import { approvedApps, confirmedThisMonth } from "@/lib/contract-notifications"
 import { CONTRACT_NOTIFICATION_SEED_CANCELLED_IDS } from "@/lib/contract-notification-constants"
+import { getTodayISO } from "@/lib/utils"
 
 export type ContractStatus =
   | "確定待ち"
@@ -52,7 +53,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "医療法人健康会",
     facilityName: "健康介護センター",
     studentName: "鈴木 大輝",
-    confirmedDate: "2024年5月10日",
+    confirmedDate: "2024-05-10",
     status: "確定済み",
     jobcan: "JC-2024-0101",
   },
@@ -63,7 +64,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "株式会社サンプル",
     facilityName: "サンプル介護施設",
     studentName: "佐藤 美咲",
-    confirmedDate: "2024年4月15日",
+    confirmedDate: "2024-04-15",
     status: "解約",
   },
   {
@@ -73,7 +74,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人光明",
     facilityName: "光明ケアセンター",
     studentName: "小林 由美",
-    confirmedDate: "2024年4月18日",
+    confirmedDate: "2024-04-18",
     status: "代位弁済依頼中",
     jobcan: "JC-2024-0401",
     subrogationRequest: {
@@ -89,7 +90,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "医療法人健康会",
     facilityName: "健康介護センター",
     studentName: "鈴木 花子",
-    confirmedDate: "2024年3月5日",
+    confirmedDate: "2024-03-05",
     status: "代位弁済依頼中",
     jobcan: "JC-2024-0102",
     subrogationRequest: {
@@ -105,7 +106,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人愛心",
     facilityName: "愛心ケアホーム",
     studentName: "田中 桃子",
-    confirmedDate: "2024年3月8日",
+    confirmedDate: "2024-03-08",
     status: "解約",
   },
   {
@@ -115,7 +116,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人愛心",
     facilityName: "愛心ケアホーム",
     studentName: "山田 一郎",
-    confirmedDate: "2024年2月20日",
+    confirmedDate: "2024-02-20",
     status: "弁済依頼承認済み",
     subrogationRequest: {
       repaymentRequestAmount: "2,100,000",
@@ -130,7 +131,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "株式会社サンプル",
     facilityName: "サンプル介護施設",
     studentName: "伊藤 次郎",
-    confirmedDate: "2024年2月25日",
+    confirmedDate: "2024-02-25",
     status: "確定済み",
     jobcan: "JC-2024-0601",
   },
@@ -141,7 +142,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人光明",
     facilityName: "光明ケアセンター",
     studentName: "渡辺 三郎",
-    confirmedDate: "2024年1月10日",
+    confirmedDate: "2024-01-10",
     status: "弁済依頼確認済み",
     subrogationRequest: {
       repaymentRequestAmount: "1,750,000",
@@ -156,9 +157,9 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "医療法人健康会",
     facilityName: "健康介護センター",
     studentName: "中村 四郎",
-    confirmedDate: "2024年1月15日",
+    confirmedDate: "2024-01-15",
     status: "取り下げ",
-    withdrawnDate: "2024年2月1日",
+    withdrawnDate: "2024-02-01",
   },
   {
     id: 111,
@@ -167,7 +168,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人愛心",
     facilityName: "愛心ケアホーム",
     studentName: "加藤 五郎",
-    confirmedDate: "2023年11月20日",
+    confirmedDate: "2023-11-20",
     status: "弁済依頼差し戻し",
     jobcan: "JC-2023-0901",
     rejectionComment: "返済請求書の金額記載に誤りがあります。修正のうえ再提出してください。",
@@ -184,7 +185,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "株式会社サンプル",
     facilityName: "サンプル介護施設",
     studentName: "松本 六郎",
-    confirmedDate: "2023年10月5日",
+    confirmedDate: "2023-10-05",
     status: "確定済み",
     jobcan: "JC-2023-1001",
   },
@@ -195,7 +196,7 @@ let _confirmedContracts: ConfirmedContract[] = [
     corporationName: "社会福祉法人光明",
     facilityName: "光明ケアセンター",
     studentName: "井上 七子",
-    confirmedDate: "2023年9月18日",
+    confirmedDate: "2023-09-18",
     status: "解約",
   },
 ]
@@ -204,39 +205,39 @@ let _confirmedContracts: ConfirmedContract[] = [
 let _priorNotices: Record<number, PriorNotice[]> = {
   101: [
     {
-      date: "2024年4月20日",
+      date: "2024-04-20",
       text: "契約者の勤務時間が変更されました。詳細は別途書類で提出予定です。",
     },
     {
-      date: "2024年5月12日",
+      date: "2024-05-12",
       text: "契約者の就業先が変更されました。新施設：健康介護センター（同一法人内異動）。",
     },
   ],
   107: [
     {
-      date: "2024年2月22日",
+      date: "2024-02-22",
       text: "契約者が自己都合により退職する見込みです。返還スケジュールの確認をお願いします。",
     },
   ],
   108: [
     {
-      date: "2024年3月1日",
+      date: "2024-03-01",
       text: "契約者の連絡先（携帯電話番号）が変更されました。",
     },
   ],
   112: [
     {
-      date: "2023年10月10日",
+      date: "2023-10-10",
       text: "契約者が転居しました。新住所は申請書類にて別途提出予定です。",
     },
   ],
   111: [
     {
-      date: "2023年12月5日",
+      date: "2023-12-05",
       text: "契約者の勤務先施設が異動となりました。新施設：愛心ケアホーム（同一法人内）。",
     },
     {
-      date: "2024年1月8日",
+      date: "2024-01-08",
       text: "契約者の就労時間が短時間勤務に変更されました。代位弁済の検討にあたりご確認をお願いします。",
     },
   ],
@@ -257,11 +258,7 @@ export function hasPriorNotices(contractId: number): boolean {
 }
 
 export function addPriorNotice(contractId: number, text: string): void {
-  const date = new Date().toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  const date = getTodayISO()
   _priorNotices = {
     ..._priorNotices,
     [contractId]: [...(_priorNotices[contractId] ?? []), { text, date }],
@@ -306,8 +303,7 @@ export function updateContract(id: number, patch: Partial<ConfirmedContract>): v
 }
 
 export function withdrawContracts(ids: number[]): void {
-  const today = new Date()
-  const withdrawnDate = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
+  const withdrawnDate = getTodayISO()
   _confirmedContracts = _confirmedContracts.map((c) =>
     ids.includes(c.id)
       ? { ...c, status: "取り下げ", withdrawnDate }
@@ -346,8 +342,7 @@ export function getContractNotificationState() {
 }
 
 export function confirmPendingContracts(ids: number[]): void {
-  const today = new Date()
-  const confirmedDate = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
+  const confirmedDate = getTodayISO()
   const toConfirm = approvedApps
     .filter((a) => ids.includes(a.id))
     .map((a) => ({
