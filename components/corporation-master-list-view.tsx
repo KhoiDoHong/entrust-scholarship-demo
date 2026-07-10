@@ -26,6 +26,10 @@ import {
   ChangeBeforeAfterLayout,
   ChangeBeforeAfterRow,
 } from "@/components/change-before-after-layout"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 const SUBROGATION_REQUESTED_STATUS: ContractStatus = "代位弁済依頼中"
 
@@ -146,7 +150,7 @@ export function CorporationMasterListView() {
   }
 
   const handleDialogSubmit = () => {
-    if (!dialogRecord) return
+    if (!dialogRecord || !dialogType) return
 
     if (dialogType === "送金先口座申請") {
       getConfirmedContracts()
@@ -158,8 +162,16 @@ export function CorporationMasterListView() {
         .forEach((c) => updateContract(c.id, { status: SUBROGATION_REQUESTED_STATUS }))
       setDaiiSubmittedIds((prev) => new Set([...prev, dialogRecord.id]))
     }
-    setSubmitConfirmOpen(false)
-    closeDialog()
+
+    const successTitle =
+      dialogType === "担当者情報変更"
+        ? MODAL_SUCCESS_MESSAGES.staffInfoChanged
+        : MODAL_SUCCESS_MESSAGES.remittanceAccountApplied
+
+    completeModalSubmitSuccess({
+      title: successTitle,
+      onClose: closeDialog,
+    })
   }
 
   const handleDialogSubmitClick = () => {

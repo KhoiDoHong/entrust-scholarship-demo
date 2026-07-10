@@ -28,6 +28,10 @@ import {
 } from "@/components/contract-notification-filters"
 import { ListPagination } from "@/components/list-pagination"
 import { ContractDetailView } from "@/components/contract-detail-view"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 export default function ConfirmedThisMonthPage() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
@@ -84,8 +88,14 @@ export default function ConfirmedThisMonthPage() {
   }
 
   const handleWithdraw = () => {
+    if (selectedConfirmed.length === 0) return
     withdrawConfirmedThisMonth(selectedConfirmed)
     setSelectedConfirmed([])
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.contractsWithdrawn,
+      onClose: () => {},
+      onRefresh: () => setNotificationState(getContractNotificationState()),
+    })
   }
 
   const handleSearch = useCallback(() => {

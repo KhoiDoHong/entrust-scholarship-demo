@@ -25,6 +25,10 @@ import {
 } from "@/lib/applications-store"
 import { filterApplicationsByRole } from "@/lib/data-scope"
 import { corpFacilityLabel } from "@/lib/contract-notifications"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 const ITEMS_PER_PAGE = 5
 
@@ -33,6 +37,7 @@ export default function ApplicationsPage() {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
   const [uploadTargetId, setUploadTargetId] = useState<number | null>(null)
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
+  const [applicationsVersion, setApplicationsVersion] = useState(0)
 
   useEffect(() => {
     setCurrentUser(getAuthenticatedSession())
@@ -40,14 +45,25 @@ export default function ApplicationsPage() {
 
   const canEditApplicationRow = canEditApplication(currentUser)
 
-  const handleUploadSubmit = () => {
+  const refreshApplications = () => setApplicationsVersion((v) => v + 1)
+
+  const closeUploadModal = () => {
     setUploadTargetId(null)
     setUploadFiles([])
   }
 
+  const handleUploadSubmit = () => {
+    if (uploadFiles.length === 0) return
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.documentsUploaded,
+      onClose: closeUploadModal,
+      onRefresh: refreshApplications,
+    })
+  }
+
   const roleFilteredApplications = useMemo(
     () => filterApplicationsByRole(getApplications(), currentUser),
-    [currentUser, pathname]
+    [currentUser, pathname, applicationsVersion]
   )
 
   const [searchApplicationNumber, setSearchApplicationNumber] = useState("")

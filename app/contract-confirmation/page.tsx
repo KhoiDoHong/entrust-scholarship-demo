@@ -27,6 +27,10 @@ import {
   SubmitConfirmDialog,
   SUBMIT_CONFIRM_MESSAGES,
 } from "@/components/submit-confirm-dialog"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 type PendingConfirmAction = "confirm" | "cancel" | null
 
@@ -88,15 +92,27 @@ export default function ContractConfirmationPage() {
     }
   }, [selectedPending])
 
+  const refreshNotificationState = () =>
+    setNotificationState(getContractNotificationState())
+
   const executePendingAction = () => {
     if (pendingAction === "confirm") {
       confirmPendingContracts(selectedPending)
       setSelectedPending([])
+      completeModalSubmitSuccess({
+        title: MODAL_SUCCESS_MESSAGES.contractsConfirmed,
+        onClose: () => setPendingAction(null),
+        onRefresh: refreshNotificationState,
+      })
     } else if (pendingAction === "cancel") {
       cancelPendingContracts(selectedPending)
       setSelectedPending([])
+      completeModalSubmitSuccess({
+        title: MODAL_SUCCESS_MESSAGES.contractsCancelled,
+        onClose: () => setPendingAction(null),
+        onRefresh: refreshNotificationState,
+      })
     }
-    setPendingAction(null)
   }
 
   const handleSearch = useCallback(() => {

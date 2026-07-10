@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Plus, X, CheckCircle2, PowerOff, Power, Search } from "lucide-react"
+import { Plus, X, PowerOff, Power, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +17,10 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { DEMO_ACCOUNTS, type UserAccount, type UserRole } from "@/lib/auth"
 import { applications } from "@/lib/applications-data"
 import { cn } from "@/lib/utils"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 import { SCHOOLS, schoolOptionLabel, CORPORATIONS as CORP_MASTER, corporationOptionLabel } from "@/lib/masters"
 
@@ -94,19 +98,35 @@ type ExtUser = UserAccount & {
   active?: boolean
 }
 
+function toExtUser(u: UserAccount): ExtUser {
+  return {
+    ...u,
+    loginId: u.userId,
+    email: `${u.userId}@example.com`,
+    phone: "090-0000-0001",
+    nameKana: "",
+    schoolName: u.role === "school" ? u.organization : undefined,
+    corporationName: u.role === "corporation" ? u.organization : undefined,
+    active: u.role !== "association",
+  }
+}
+
+let sessionExtraUsers: ExtUser[] = []
+const userActiveOverrides = new Map<string, boolean>()
+
+function fetchUsers(): ExtUser[] {
+  return [...DEMO_ACCOUNTS.map(toExtUser), ...sessionExtraUsers].map((u) => ({
+    ...u,
+    active: userActiveOverrides.has(u.loginId)
+      ? userActiveOverrides.get(u.loginId)
+      : u.active,
+  }))
+}
+
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<ExtUser[]>(
-    DEMO_ACCOUNTS.map((u) => ({
-      ...u,
-      loginId: u.userId,
-      email: `${u.userId}@example.com`,
-      phone: "090-0000-0001",
-      nameKana: "",
-      schoolName: u.role === "school" ? u.organization : undefined,
-      corporationName: u.role === "corporation" ? u.organization : undefined,
-      active: u.role !== "association",
-    }))
-  )
+  const [users, setUsers] = useState<ExtUser[]>(() => fetchUsers())
+
+  const refreshUsers = () => setUsers(fetchUsers())
 
   const [filters, setFilters] = useState({
     loginId: "",
@@ -124,7 +144,6 @@ export default function UserManagementPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState<FormState>(EMPTY)
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
-  const [done, setDone] = useState(false)
 
   const set = (key: keyof FormState) => (value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -134,13 +153,13 @@ export default function UserManagementPage() {
   const openCreate = () => {
     setForm(EMPTY)
     setErrors({})
-    setDone(false)
     setModalOpen(true)
   }
 
   const closeModal = () => {
     setModalOpen(false)
-    setDone(false)
+    setForm(EMPTY)
+    setErrors({})
   }
 
   const toggleActive = (index: number) => {
@@ -152,8 +171,16 @@ export default function UserManagementPage() {
   const confirmToggle = () => {
     if (!confirmTarget) return
     const { index, action } = confirmTarget
-    setUsers((prev) => prev.map((u, i) => i === index ? { ...u, active: action === "activate" } : u))
-    setConfirmTarget(null)
+    const targetUser = users[index]
+    userActiveOverrides.set(targetUser.loginId, action === "activate")
+    completeModalSubmitSuccess({
+      title:
+        action === "activate"
+          ? MODAL_SUCCESS_MESSAGES.userActivated
+          : MODAL_SUCCESS_MESSAGES.userDeactivated,
+      onClose: () => setConfirmTarget(null),
+      onRefresh: refreshUsers,
+    })
   }
 
   const filteredUsers = useMemo(() => {
@@ -203,18 +230,29 @@ export default function UserManagementPage() {
   const handleSubmit = () => {
     if (!validate()) return
     const roleLabel = USER_ROLES.find((r) => r.value === form.role)?.label ?? ""
-    setUsers((prev) => [...prev, {
+    const newUser: ExtUser = {
       loginId: form.email.split("@")[0] || form.name,
-      email: form.email, phone: form.phone, name: form.name,
+      email: form.email,
+      phone: form.phone,
+      name: form.name,
       nameKana: form.nameKana,
       role: form.role as UserRole,
       userId: form.email.split("@")[0] || form.name,
-      label: roleLabel, organization: form.houjinId || form.operatorId,
+      label: roleLabel,
+      organization: form.houjinId || form.operatorId,
       schoolName: form.houjinId || undefined,
       corporationName: form.operatorId || undefined,
-      houjinId: form.houjinId, operatorId: form.operatorId, active: true,
-    }])
-    setDone(true)
+      houjinId: form.houjinId,
+      operatorId: form.operatorId,
+      active: true,
+    }
+    sessionExtraUsers = [...sessionExtraUsers, newUser]
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.userCreated,
+      description: form.email,
+      onClose: closeModal,
+      onRefresh: refreshUsers,
+    })
   }
 
   const showHoujin = form.role === "school"
@@ -393,8 +431,7 @@ export default function UserManagementPage() {
             </div>
 
             <div className="px-6 py-5">
-              {!done ? (
-                <div className="space-y-5">
+              <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <FormField id="m-email" label="メールアドレス" type="email" value={form.email}
@@ -470,32 +507,17 @@ export default function UserManagementPage() {
                       </Select>
                     </div>
                   )}
-                </div>
-              ) : (
-                <div className="text-center py-6 space-y-4">
-                  <CheckCircle2 className="w-14 h-14 text-green-500 mx-auto" />
-                  <div>
-                    <p className="font-semibold text-gray-900">ユーザを作成しました</p>
-                    <p className="text-sm text-gray-500 mt-1">{form.email}</p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 px-6 pb-5">
-              {!done ? (
-                <>
-                  <Button variant="outline" onClick={closeModal}>キャンセル</Button>
-                  <Button
-                    onClick={handleSubmit}
-                    className="bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white"
-                  >
-                    作成
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={closeModal}>閉じる</Button>
-              )}
+              <Button variant="outline" onClick={closeModal}>キャンセル</Button>
+              <Button
+                onClick={handleSubmit}
+                className="bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white"
+              >
+                作成
+              </Button>
             </div>
           </div>
         </div>

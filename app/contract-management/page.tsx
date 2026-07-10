@@ -26,6 +26,10 @@ import {
   SubmitConfirmDialog,
   SUBMIT_CONFIRM_MESSAGES,
 } from "@/components/submit-confirm-dialog"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 import { corpFacilityLabel } from "@/lib/contract-notifications"
 import { findCorporationMasterForContract } from "@/lib/corporation-master-data"
 import { FACILITY_APPLICANTS, facilityApplicantLabel } from "@/lib/masters"
@@ -228,17 +232,13 @@ export default function ContractManagementPage() {
   }
 
   const handleDialogSubmit = () => {
-    if (!dialogContract) return
+    if (!dialogContract || !dialogType) return
 
     if (dialogType === "契約者情報変更") {
       updateContract(dialogContract.id, {
         studentName: `${contractorLastName} ${contractorFirstName}`,
         enrollmentDate: contractorEnrollmentDate || undefined,
       })
-      refreshContracts()
-    }
-    if (dialogType === "連帯保証人変更") {
-      refreshContracts()
     }
     if (dialogType === "事前通知") {
       addPriorNotice(dialogContract.id, noticeText)
@@ -254,7 +254,6 @@ export default function ContractManagementPage() {
           privacyConsentFile: subrogationFiles.privacy_consent?.name,
         },
       })
-      refreshContracts()
       if (selectedContract?.id === dialogContract.id) {
         setSelectedContract((prev) =>
           prev
@@ -271,8 +270,19 @@ export default function ContractManagementPage() {
         )
       }
     }
-    setSubmitConfirmOpen(false)
-    closeDialog()
+
+    const successTitleByDialog: Partial<Record<NonNullable<typeof dialogType>, string>> = {
+      契約者情報変更: MODAL_SUCCESS_MESSAGES.contractorInfoChanged,
+      連帯保証人変更: MODAL_SUCCESS_MESSAGES.guarantorChanged,
+      事前通知: MODAL_SUCCESS_MESSAGES.priorNoticeSent,
+      代位弁済依頼: MODAL_SUCCESS_MESSAGES.subrogationRequested,
+    }
+
+    completeModalSubmitSuccess({
+      title: successTitleByDialog[dialogType] ?? "処理が完了しました",
+      onClose: closeDialog,
+      onRefresh: refreshContracts,
+    })
   }
 
   const handleDialogSubmitClick = () => {
@@ -295,11 +305,14 @@ export default function ContractManagementPage() {
   const handleCompletedPayment = () => {
     if (!completionReportContract) return
     updateContract(completionReportContract.id, { status: "解約" })
-    refreshContracts()
     if (selectedContract?.id === completionReportContract.id) {
       setSelectedContract((prev) => (prev ? { ...prev, status: "解約" } : prev))
     }
-    setCompletionReportContract(null)
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.completionReported,
+      onClose: () => setCompletionReportContract(null),
+      onRefresh: refreshContracts,
+    })
   }
 
   const openCompletionReportConfirm = (contract: ConfirmedContract) => {

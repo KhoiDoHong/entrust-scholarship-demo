@@ -43,6 +43,10 @@ import {
   ChangeBeforeAfterLayout,
   ChangeBeforeAfterRow,
 } from "@/components/change-before-after-layout"
+import {
+  completeModalSubmitSuccess,
+  MODAL_SUCCESS_MESSAGES,
+} from "@/lib/modal-submit-success"
 
 export type ContractApplyDialogConfig = {
   title: string
@@ -102,9 +106,11 @@ export function ContractManagementListView({
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
 
+  const refreshContracts = () => setContracts([...getConfirmedContracts()])
+
   useEffect(() => {
     setCurrentUser(getAuthenticatedSession())
-    setContracts([...getConfirmedContracts()])
+    refreshContracts()
   }, [])
 
   useEffect(() => {
@@ -186,9 +192,14 @@ export function ContractManagementListView({
     if (!jobcanDialogContract) return
     if (!isRemittanceApply) {
       updateContract(jobcanDialogContract.id, { jobcan: jobcanAfter.trim() || undefined })
-      setContracts([...getConfirmedContracts()])
     }
-    closeJobcanDialog()
+    completeModalSubmitSuccess({
+      title: isRemittanceApply
+        ? MODAL_SUCCESS_MESSAGES.remittanceAccountSubmitted
+        : MODAL_SUCCESS_MESSAGES.jobcanUpdated,
+      onClose: closeJobcanDialog,
+      onRefresh: refreshContracts,
+    })
   }
 
   const handleJobcanSubmitClick = () => {
@@ -245,9 +256,12 @@ export function ContractManagementListView({
         updateContract(id, { status: "弁済依頼確認済み" })
       })
     }
-    setContracts([...getConfirmedContracts()])
     setSelectedIds([])
-    setBulkConfirmOpen(false)
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.bulkConfirmed,
+      onClose: () => setBulkConfirmOpen(false),
+      onRefresh: refreshContracts,
+    })
   }
 
   const handleBulkReject = () => {
@@ -259,8 +273,12 @@ export function ContractManagementListView({
         rejectionComment: "提出書類に不備があります。内容を確認のうえ再提出してください。",
       })
     })
-    setContracts([...getConfirmedContracts()])
     setSelectedIds([])
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.bulkRejected,
+      onClose: () => {},
+      onRefresh: refreshContracts,
+    })
   }
 
   const rejectSubrogationRequest = (id: number, rejectionComment: string) => {
@@ -268,14 +286,20 @@ export function ContractManagementListView({
       status: "弁済依頼差し戻し",
       rejectionComment,
     })
-    setContracts([...getConfirmedContracts()])
-    setSelectedContract(null)
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.subrogationRejected,
+      onClose: () => setSelectedContract(null),
+      onRefresh: refreshContracts,
+    })
   }
 
   const confirmSubrogationRequest = (id: number) => {
     updateContract(id, { status: "弁済依頼確認済み" })
-    setContracts([...getConfirmedContracts()])
-    setSelectedContract(null)
+    completeModalSubmitSuccess({
+      title: MODAL_SUCCESS_MESSAGES.subrogationConfirmed,
+      onClose: () => setSelectedContract(null),
+      onRefresh: refreshContracts,
+    })
   }
 
   const columnCount =
