@@ -178,7 +178,7 @@ export default function ContractConfirmationPage() {
   return (
     <DashboardLayout>
       <ContractNotificationListView
-        title="契約確定通知"
+        title="契約確定待ち一覧"
         subtitle={
           currentUser.role === "corporation"
             ? "法人施設に関連する契約確定待ち一覧です"
