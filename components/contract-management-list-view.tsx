@@ -69,6 +69,8 @@ interface ContractManagementListViewProps {
   showPriorNoticeColumn?: boolean
   /** 弁済依頼対象: nút 確認 → detail với 差し戻し/確認 ở cuối */
   detailReviewMode?: boolean
+  /** Hide status filter and status column (e.g. 弁済依頼対象). */
+  showStatusFilter?: boolean
 }
 
 function isBulkSelectable(contract: ConfirmedContract): boolean {
@@ -86,6 +88,7 @@ export function ContractManagementListView({
   acknowledgeWorkflowKey,
   showPriorNoticeColumn = false,
   detailReviewMode = false,
+  showStatusFilter = true,
 }: ContractManagementListViewProps) {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
   const [contracts, setContracts] = useState<ConfirmedContract[]>([])
@@ -134,10 +137,12 @@ export function ContractManagementListView({
     [roleFilteredContracts]
   )
 
-  const filteredContracts = useMemo(
-    () => applyContractListFilters(roleFilteredContracts, appliedFilters),
-    [roleFilteredContracts, appliedFilters]
-  )
+  const filteredContracts = useMemo(() => {
+    const effectiveFilters = showStatusFilter
+      ? appliedFilters
+      : { ...appliedFilters, status: "all" }
+    return applyContractListFilters(roleFilteredContracts, effectiveFilters)
+  }, [roleFilteredContracts, appliedFilters, showStatusFilter])
 
   const totalPages = Math.ceil(filteredContracts.length / CONTRACT_LIST_ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * CONTRACT_LIST_ITEMS_PER_PAGE
@@ -303,7 +308,10 @@ export function ContractManagementListView({
   }
 
   const columnCount =
-    (showJobcan ? 7 : 6) + (showBulkSelection ? 1 : 0) + (showPriorNoticeColumn ? 1 : 0)
+    (showJobcan ? 7 : 6) -
+    (showStatusFilter ? 0 : 1) +
+    (showBulkSelection ? 1 : 0) +
+    (showPriorNoticeColumn ? 1 : 0)
 
   if (selectedContract) {
     return (
@@ -333,7 +341,7 @@ export function ContractManagementListView({
       <Card>
         <CardContent className="p-6">
           <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className={`grid grid-cols-1 gap-3 ${showStatusFilter ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">契約番号</label>
                 <Input
@@ -362,6 +370,7 @@ export function ContractManagementListView({
                   </SelectContent>
                 </Select>
               </div>
+              {showStatusFilter && (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">ステータス</label>
                 <Select
@@ -382,6 +391,7 @@ export function ContractManagementListView({
                   </SelectContent>
                 </Select>
               </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -445,7 +455,9 @@ export function ContractManagementListView({
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">契約連帯保証人</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">契約者</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-32">契約確定日</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-28">ステータス</th>
+                  {showStatusFilter && (
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 w-28">ステータス</th>
+                  )}
                   {showPriorNoticeColumn && (
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">通知内容</th>
                   )}
@@ -483,9 +495,11 @@ export function ContractManagementListView({
                       <td className="py-4 px-4 text-sm text-gray-900">{corpFacilityLabel(c)}</td>
                       <td className="py-4 px-4 text-sm text-gray-900">{c.studentName}</td>
                       <td className="py-4 px-4 text-sm text-gray-900">{c.confirmedDate}</td>
-                      <td className="py-4 px-4">
-                        <ContractStatusBadge status={c.status} />
-                      </td>
+                      {showStatusFilter && (
+                        <td className="py-4 px-4">
+                          <ContractStatusBadge status={c.status} />
+                        </td>
+                      )}
                       {showPriorNoticeColumn && (
                         <td className="py-4 px-4 text-sm text-gray-900 max-w-xs">
                           <p className="line-clamp-2 whitespace-pre-wrap">

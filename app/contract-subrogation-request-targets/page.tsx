@@ -10,6 +10,7 @@ export default function ContractSubrogationRequestTargetsPage() {
         title="弁済依頼対象"
         subtitle="弁済依頼の対象となる契約の一覧です"
         detailReviewMode
+        showStatusFilter={false}
         contractPredicate={(c) => c.status === "代位弁済依頼中"}
       />
     </DashboardLayout>

@@ -21,7 +21,7 @@ import {
   getConfirmedContracts,
   type ConfirmedContract,
 } from "@/lib/contracts-store"
-import { ContractNotificationListView } from "@/components/contract-notification-list-view"
+import { ContractNotificationListView, type ContractNotificationRow } from "@/components/contract-notification-list-view"
 import { ContractDetailView } from "@/components/contract-detail-view"
 import {
   SubmitConfirmDialog,
@@ -124,20 +124,21 @@ export default function ContractConfirmationPage() {
     setAppliedFilters({ ...EMPTY_CONTRACT_FILTERS })
   }, [])
 
-  const openContractDetail = useCallback((row: (typeof visiblePendingRows)[number]) => {
+  const openContractDetail = useCallback((row: ContractNotificationRow) => {
+    const app = approvedApps.find((a) => a.id === row.id)
     const existing = getConfirmedContracts().find(
       (c) =>
         c.contractNumber === row.contractNumber ||
-        c.applicationNumber === row.applicationNumber
+        (app != null && c.applicationNumber === app.applicationNumber)
     )
     const base: ConfirmedContract = existing ?? {
       id: row.id,
-      applicationNumber: row.applicationNumber,
+      applicationNumber: app?.applicationNumber ?? "",
       contractNumber: row.contractNumber,
       corporationName: row.corporationName,
       facilityName: row.facilityName,
       studentName: row.studentName,
-      approvedDate: row.approvedDate,
+      approvedDate: app?.approvedDate,
       confirmedDate: "",
       status: "確定済み",
     }
